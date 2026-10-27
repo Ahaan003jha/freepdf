@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FreePDF Tools – merge, split, rotate, sign, compress PDFs</title>
+<meta name="description" content="Free online PDF tools: merge, split, rotate, sign, compress and convert images to PDF. No sign-up, files stay on your device.">
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--text:#1b1f2a;--muted:#667085;--line:#e3e6ee;--brand:#e5322d;--brand-t:#fff;--ok:#12805c;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12141a;--card:#1c1f28;--text:#eceef4;--muted:#9aa3b5;--line:#2c3140;--brand:#ff5a54;--brand-t:#fff;--ok:#4cc9a0}}
+:root[data-theme="dark"]{--bg:#12141a;--card:#1c1f28;--text:#eceef4;--muted:#9aa3b5;--line:#2c3140;--brand:#ff5a54;--brand-t:#fff;--ok:#4cc9a0}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{padding:28px 16px 8px;text-align:center}
+h1{margin:0;font-size:1.7rem}h1 span{color:var(--brand)}
+header p{margin:6px auto 0;color:var(--muted);max-width:520px}
+.badge{display:inline-block;margin-top:10px;padding:3px 10px;border-radius:99px;background:var(--card);border:1px solid var(--line);font-size:.8rem;color:var(--ok)}
+main{max-width:640px;margin:0 auto;padding:12px 16px 40px}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding:8px 0}
+.tabs button{flex:1 0 auto;padding:10px 14px;border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:10px;font:inherit;cursor:pointer}
+.tabs button.on{background:var(--brand);color:var(--brand-t);border-color:var(--brand)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.panel{display:none}.panel.on{display:block}
+h2{margin:0 0 4px;font-size:1.15rem}.hint{margin:0 0 14px;color:var(--muted);font-size:.9rem}
+label{display:block;margin:12px 0 4px;font-size:.88rem;color:var(--muted)}
+input[type=text],input[type=number],select,input[type=file]{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);font:inherit}
+input[type=range]{width:100%}
+.row{display:flex;gap:10px}.row>*{flex:1}
+.go{margin-top:16px;width:100%;padding:12px;border:0;border-radius:10px;background:var(--brand);color:var(--brand-t);font:inherit;font-weight:600;cursor:pointer}
+.go:disabled{opacity:.5}
+.list{margin:10px 0 0;padding:0;list-style:none}
+.list li{display:flex;align-items:center;gap:6px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;margin-bottom:6px;font-size:.9rem}
+.list li span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.list button{border:1px solid var(--line);background:var(--bg);color:var(--text);border-radius:6px;padding:2px 8px;cursor:pointer}
+#prev{position:relative;margin-top:8px;touch-action:none}#eprev{position:relative;margin-top:8px;touch-action:none;cursor:crosshair}#eprev canvas{height:auto;background:#fff;display:block}#eprev .e{position:absolute;background:#fff;color:#000;overflow:hidden;white-space:nowrap;outline:1px dashed var(--ok)}#esel{position:absolute;border:2px solid var(--brand);background:rgba(229,50,45,.15);display:none}#ov{position:absolute;left:0;top:0;cursor:grab;border:1px dashed var(--brand);display:none;user-select:none;color:#000;white-space:nowrap}#ov img{width:100%;display:block;pointer-events:none}canvas{width:100%;height:150px;border:1px dashed var(--line);border-radius:8px;background:#fff;touch-action:none}
+.msg{margin-top:12px;min-height:1.4em;font-size:.9rem;color:var(--muted)}.msg.ok{color:var(--ok)}.msg.err{color:var(--brand)}
+.sm{background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;font:inherit;font-size:.85rem;padding:4px 0}
+footer{text-align:center;color:var(--muted);font-size:.8rem;padding:0 16px 24px}
+</style>
+</head>
+<body>
+<header>
+<h1>Free<span>PDF</span> Tools</h1>
+<p>Merge, split, rotate and sign PDFs – free, no sign-up, no watermark.</p>
+<div class="badge">🔒 Your files never leave your device</div>
+</header>
+<main>
+<div class="tabs" id="tabs">
+<button data-t="merge" class="on">Merge</button><button data-t="split">Split / Remove</button><button data-t="rotate">Rotate</button><button data-t="sign">Sign / Add text</button><button data-t="edit">Edit text</button><button data-t="img">Image to PDF</button><button data-t="comp">Compress</button>
+</div>
+
+<section class="card panel on" id="merge">
+<h2>Merge PDFs</h2><p class="hint">Combine several PDFs into one. Reorder with the arrows.</p>
+<input type="file" id="mFiles" accept="application/pdf" multiple>
+<ul class="list" id="mList"></ul>
+<button class="go" id="mGo" disabled>Merge and download</button>
+<div class="msg" id="mMsg"></div>
+</section>
+
+<section class="card panel" id="split">
+<h2>Split or remove pages</h2><p class="hint">Pick pages like 1-3, 5, 8-10.</p>
+<input type="file" id="sFile" accept="application/pdf">
+<label>Pages</label><input type="text" id="sRange" placeholder="1-3, 5, 8-10">
+<label>Action</label>
+<select id="sMode"><option value="keep">Keep only these pages</option><option value="remove">Remove these pages</option></select>
+<button class="go" id="sGo">Create PDF</button>
+<div class="msg" id="sMsg"></div>
+</section>
+
+<section class="card panel" id="rotate">
+<h2>Rotate pages</h2><p class="hint">Leave pages empty to rotate the whole document.</p>
+<input type="file" id="rFile" accept="application/pdf">
+<div class="row"><div><label>Pages (optional)</label><input type="text" id="rRange" placeholder="all"></div>
+<div><label>Rotate</label><select id="rAngle"><option value="90">90° right</option><option value="180">180°</option><option value="270">90° left</option></select></div></div>
+<button class="go" id="rGo">Rotate and download</button>
+<div class="msg" id="rMsg"></div>
+</section>
+
+<section class="card panel" id="sign">
+<h2>Sign or add text</h2><p class="hint">Place a signature or text on any page. Adjust position with the sliders.</p>
+<input type="file" id="gFile" accept="application/pdf">
+<label>What to add</label>
+<select id="gMode"><option value="sig">Drawn signature</option><option value="txt">Text</option></select>
+<div id="gSig"><canvas id="pad" width="600" height="300"></canvas><button class="sm" id="clr">Clear signature</button></div>
+<div id="gTxt" style="display:none"><label>Text</label><input type="text" id="gText" placeholder="Your text"></div>
+<div class="row"><div><label>Page number</label><input type="text" id="gPage" value="1"></div>
+<div><label id="szL">Size</label><input type="number" id="gSize" value="30" min="5" max="100"></div></div>
+<label><input type="checkbox" id="gAll"> Apply to all pages</label>
+<button class="go" id="gPlace" style="background:var(--card);color:var(--text);border:1px solid var(--line)">1. Show page and place item</button>
+<p class="hint" style="margin:10px 0 0">2. Drag the item where you want it.</p>
+<div id="prev"><canvas id="pv" style="display:none;height:auto;background:#fff"></canvas><div id="ov"></div></div>
+<button class="go" id="gGo">Apply and download</button>
+<div class="msg" id="gMsg"></div>
+</section>
+<section class="card panel" id="edit">
+<h2>Edit text</h2><p class="hint">Covers old text with a white box and types new text on top. The old text stays hidden underneath in the file, so don’t use this to hide secrets.</p>
+<input type="file" id="eFile" accept="application/pdf">
+<div class="row"><div><label>Page number</label><input type="text" id="eP" value="1"></div><div><label>Font size</label><input type="number" id="eS" value="12" min="4" max="120"></div></div>
+<button class="go" id="eShow" style="background:var(--card);color:var(--text);border:1px solid var(--line)">1. Show page</button>
+<p class="hint" style="margin:10px 0 0">2. Drag a box over the text you want to replace.</p>
+<div id="eprev"><canvas id="epv" style="display:none"></canvas><div id="esel"></div></div>
+<label>3. New text</label><input type="text" id="eT" placeholder="Type the replacement text">
+<div class="row"><button class="go" id="eAdd">Add this edit</button><button class="go" id="eUndo" style="background:var(--card);color:var(--text);border:1px solid var(--line)">Undo last</button></div>
+<button class="go" id="eGo" disabled>Apply edits and download</button>
+<div class="msg" id="eMsg"></div>
+</section>
+
+<section class="card panel" id="img">
+<h2>Image to PDF</h2><p class="hint">Turn JPG or PNG images into one PDF, one image per page.</p>
+<input type="file" id="iFiles" accept="image/png,image/jpeg" multiple>
+<ul class="list" id="iList"></ul>
+<button class="go" id="iGo" disabled>Create PDF</button>
+<div class="msg" id="iMsg"></div>
+</section>
+
+<section class="card panel" id="comp">
+<h2>Compress PDF</h2><p class="hint">Shrinks big scanned PDFs by re-rendering pages as images. Text becomes non-selectable, so use it for scans and photos.</p>
+<input type="file" id="cFile" accept="application/pdf">
+<label>Quality</label>
+<select id="cQ"><option value="0.7|1.5">Good (medium size)</option><option value="0.5|1.2" selected>Balanced (smaller)</option><option value="0.35|1">Smallest</option></select>
+<button class="go" id="cGo">Compress and download</button>
+<div class="msg" id="cMsg"></div>
+</section>
+</main>
+<footer>Everything runs in your browser using open-source pdf-lib and PDF.js.</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const {PDFDocument,StandardFonts,rgb,degrees}=window.PDFLib||{};
+function say(id,t,c){const e=$(id);e.textContent=t;e.className='msg '+(c||'')}
+async function load(f){return PDFDocument.load(await f.arrayBuffer(),{ignoreEncryption:true})}
+function parse(s,n){const o=[];for(const p of s.split(',')){const t=p.trim();if(!t)continue;const m=t.match(/^(\d+)(?:\s*-\s*(\d+))?$/);if(!m)throw new Error('Could not read “'+t+'”');let a=+m[1],b=m[2]?+m[2]:a;if(a>b)[a,b]=[b,a];if(a<1||b>n)throw new Error('Pages must be between 1 and '+n);for(let i=a;i<=b;i++)o.push(i-1)}return o}
+async function save(bytes,name,id){
+  const blob=new Blob([bytes],{type:'application/pdf'});
+  try{
+    const d=window.claude&&await claude.use('downloads');
+    if(d){await d.save({filename:name,data:blob});say(id,'Done – '+name+' saved.','ok');return}
+  }catch(e){if(e&&e.code==='declined'){say(id,'Download cancelled.');return}}
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();
+  say(id,'Done – '+name+' is ready.','ok');
+}
+async function run(btn,id,fn){btn.disabled=true;say(id,'Working…');try{await fn()}catch(e){say(id,e.message||'Something went wrong. Is the PDF password-protected?','err')}btn.disabled=false}
+
+document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#tabs button,.panel').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');$(b.dataset.t).classList.add('on')});
+
+// Merge
+let mf=[];
+function drawList(){const ul=$('mList');ul.innerHTML='';mf.forEach((f,i)=>{const li=document.createElement('li');const s=document.createElement('span');s.textContent=(i+1)+'. '+f.name;li.appendChild(s);
+  [['↑',-1],['↓',1],['✕',0]].forEach(([t,d])=>{const b=document.createElement('button');b.textContent=t;b.onclick=()=>{if(!d)mf.splice(i,1);else if(mf[i+d])[mf[i],mf[i+d]]=[mf[i+d],mf[i]];drawList()};li.appendChild(b)});ul.appendChild(li)});
+  $('mGo').disabled=mf.length<2}
+$('mFiles').onchange=e=>{mf=mf.concat([...e.target.files]);e.target.value='';drawList()};
+$('mGo').onclick=()=>run($('mGo'),'mMsg',async()=>{const out=await PDFDocument.create();
+  for(const f of mf){const d=await load(f);(await out.copyPages(d,d.getPageIndices())).forEach(p=>out.addPage(p))}
+  await save(await out.save(),'merged.pdf','mMsg')});
+
+// Split / remove
+$('sGo').onclick=()=>run($('sGo'),'sMsg',async()=>{const f=$('sFile').files[0];if(!f)throw new Error('Choose a PDF first.');
+  const d=await load(f),n=d.getPageCount();if(!$('sRange').value.trim())throw new Error('Enter the pages first.');
+  let idx=[...new Set(parse($('sRange').value,n))].sort((a,b)=>a-b);
+  if($('sMode').value==='remove')idx=d.getPageIndices().filter(i=>!idx.includes(i));
+  if(!idx.length)throw new Error('That would leave no pages.');
+  const out=await PDFDocument.create();(await out.copyPages(d,idx)).forEach(p=>out.addPage(p));
+  await save(await out.save(),'edited.pdf','sMsg')});
+
+// Rotate
+$('rGo').onclick=()=>run($('rGo'),'rMsg',async()=>{const f=$('rFile').files[0];if(!f)throw new Error('Choose a PDF first.');
+  const d=await load(f),n=d.getPageCount(),r=$('rRange').value.trim();
+  const idx=r&&r!=='all'?parse(r,n):d.getPageIndices();
+  idx.forEach(i=>{const p=d.getPage(i);p.setRotation(degrees((p.getRotation().angle+ +$('rAngle').value)%360))});
+  await save(await d.save(),'rotated.pdf','rMsg')});
+
+// Sign / text
+const pad=$('pad'),cx=pad.getContext('2d');let draw=false,inked=false;
+cx.lineWidth=5;cx.lineCap='round';cx.strokeStyle='#111';
+function pt(e){const r=pad.getBoundingClientRect();return[(e.clientX-r.left)*pad.width/r.width,(e.clientY-r.top)*pad.height/r.height]}
+pad.onpointerdown=e=>{draw=true;pad.setPointerCapture(e.pointerId);const[x,y]=pt(e);cx.beginPath();cx.moveTo(x,y)};
+pad.onpointermove=e=>{if(!draw)return;const[x,y]=pt(e);cx.lineTo(x,y);cx.stroke();inked=true};
+pad.onpointerup=()=>draw=false;
+$('clr').onclick=()=>{cx.clearRect(0,0,pad.width,pad.height);inked=false};
+$('gMode').onchange=e=>{const s=e.target.value==='sig';$('gSig').style.display=s?'':'none';$('gTxt').style.display=s?'none':'';$('szL').textContent=s?'Width (% of page)':'Font size';$('gSize').value=s?30:18};
+$('szL').textContent='Width (% of page)';
+if(window.pdfjsLib)pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+async function render(f,pn,scale,canvas){const u=new Uint8Array(await f.arrayBuffer());const doc=await pdfjsLib.getDocument({data:u}).promise;
+  if(pn<1||pn>doc.numPages)throw new Error('Page must be 1 to '+doc.numPages);
+  const pg=await doc.getPage(pn),vp=pg.getViewport({scale});canvas.width=vp.width;canvas.height=vp.height;
+  await pg.render({canvasContext:canvas.getContext('2d'),viewport:vp}).promise;return{n:doc.numPages,w:pg.getViewport({scale:1}).width,h:pg.getViewport({scale:1}).height}}
+let pos={x:.5,y:.5},pageW=612,placed=false;
+const ov=$('ov'),pv=$('pv');
+$('gPlace').onclick=()=>run($('gPlace'),'gMsg',async()=>{const f=$('gFile').files[0];if(!f)throw new Error('Choose a PDF first.');
+  const sig=$('gMode').value==='sig';
+  if(sig&&!inked)throw new Error('Draw your signature first.');if(!sig&&!$('gText').value.trim())throw new Error('Type the text first.');
+  const r=await render(f,parseInt($('gPage').value)||1,1.3,pv);pageW=r.w;pv.style.display='block';
+  ov.innerHTML='';const sz=+$('gSize').value||20,cw=pv.getBoundingClientRect().width;
+  if(sig){const im=new Image();im.src=pad.toDataURL('image/png');ov.appendChild(im);ov.style.width=sz+'%';ov.style.font=''}
+  else{ov.textContent=$('gText').value;ov.style.width='auto';ov.style.font=(sz*cw/pageW)+'px Helvetica,Arial,sans-serif'}
+  ov.style.display='block';pos={x:.1,y:.1};mv();placed=true;say('gMsg','Drag the item into place, then press Apply.','')});
+function mv(){ov.style.left=pos.x*100+'%';ov.style.top=pos.y*100+'%'}
+let dr=null;
+ov.onpointerdown=e=>{ov.setPointerCapture(e.pointerId);const r=pv.getBoundingClientRect();dr={dx:e.clientX-(r.left+pos.x*r.width),dy:e.clientY-(r.top+pos.y*r.height)};ov.style.cursor='grabbing'};
+ov.onpointermove=e=>{if(!dr)return;const r=pv.getBoundingClientRect(),o=ov.getBoundingClientRect();
+  pos.x=Math.max(0,Math.min(1-o.width/r.width,(e.clientX-dr.dx-r.left)/r.width));pos.y=Math.max(0,Math.min(1-o.height/r.height,(e.clientY-dr.dy-r.top)/r.height));mv()};
+ov.onpointerup=()=>{dr=null;ov.style.cursor='grab'};
+$('gGo').onclick=()=>run($('gGo'),'gMsg',async()=>{const f=$('gFile').files[0];if(!f)throw new Error('Choose a PDF first.');
+  if(!placed)throw new Error('Press “Show page and place item” first.');
+  const d=await load(f),n=d.getPageCount(),sig=$('gMode').value==='sig';
+  const idx=$('gAll').checked?d.getPageIndices():parse($('gPage').value||'1',n);
+  const sz=+$('gSize').value||20,o=ov.getBoundingClientRect(),r=pv.getBoundingClientRect();
+  let img,font,txt=$('gText').value;
+  if(sig)img=await d.embedPng(pad.toDataURL('image/png'));else font=await d.embedFont(StandardFonts.Helvetica);
+  for(const i of idx){const p=d.getPage(i),{width:W,height:H}=p.getSize();
+    if(sig){const w=W*sz/100,h=w*img.height/img.width;p.drawImage(img,{x:pos.x*W,y:H-pos.y*H-h,width:w,height:h})}
+    else{p.drawText(txt,{x:pos.x*W,y:H-pos.y*H-sz*.8,size:sz,font,color:rgb(0,0,0)})}}
+  await save(await d.save(),'signed.pdf','gMsg')});
+
+// Image to PDF
+let imgs=[];
+function drawImgs(){const ul=$('iList');ul.innerHTML='';imgs.forEach((f,i)=>{const li=document.createElement('li');const s=document.createElement('span');s.textContent=(i+1)+'. '+f.name;li.appendChild(s);
+  [['↑',-1],['↓',1],['✕',0]].forEach(([t,dd])=>{const b=document.createElement('button');b.textContent=t;b.onclick=()=>{if(!dd)imgs.splice(i,1);else if(imgs[i+dd])[imgs[i],imgs[i+dd]]=[imgs[i+dd],imgs[i]];drawImgs()};li.appendChild(b)});ul.appendChild(li)});
+  $('iGo').disabled=!imgs.length}
+$('iFiles').onchange=e=>{imgs=imgs.concat([...e.target.files]);e.target.value='';drawImgs()};
+$('iGo').onclick=()=>run($('iGo'),'iMsg',async()=>{const d=await PDFDocument.create();
+  for(const f of imgs){const b=await f.arrayBuffer();const im=f.type==='image/png'?await d.embedPng(b):await d.embedJpg(b);
+    const sc=Math.min(1,1200/Math.max(im.width,im.height));const p=d.addPage([im.width*sc,im.height*sc]);p.drawImage(im,{x:0,y:0,width:im.width*sc,height:im.height*sc})}
+  await save(await d.save(),'images.pdf','iMsg')});
+
+// Compress
+$('cGo').onclick=()=>run($('cGo'),'cMsg',async()=>{const f=$('cFile').files[0];if(!f)throw new Error('Choose a PDF first.');
+  const[q,sc]=$('cQ').value.split('|').map(Number);
+  const doc=await pdfjsLib.getDocument({data:new Uint8Array(await f.arrayBuffer())}).promise;
+  const out=await PDFDocument.create(),c=document.createElement('canvas');
+  for(let i=1;i<=doc.numPages;i++){say('cMsg','Page '+i+' of '+doc.numPages+'…');
+    const pg=await doc.getPage(i),vp=pg.getViewport({scale:sc});c.width=vp.width;c.height=vp.height;
+    const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);await pg.render({canvasContext:g,viewport:vp}).promise;
+    const jb=await new Promise(r=>c.toBlob(r,'image/jpeg',q));const im=await out.embedJpg(await jb.arrayBuffer());
+    const u=pg.getViewport({scale:1});const p=out.addPage([u.width,u.height]);p.drawImage(im,{x:0,y:0,width:u.width,height:u.height})}
+  const bytes=await out.save();
+  if(bytes.length>=f.size){say('cMsg','This file is already small – compression would make it bigger, so nothing was saved.','err');return}
+  await save(bytes,'compressed.pdf','cMsg');say('cMsg','Done – '+(f.size/1048576).toFixed(2)+' MB → '+(bytes.length/1048576).toFixed(2)+' MB.','ok')});
+
+// Edit text (whiteout + retype)
+let edits=[],ePage=1,eDim={w:612,h:792},eSel=null,eStart=null;
+const epv=$('epv'),esel=$('esel'),epr=$('eprev');
+function eDraw(){epr.querySelectorAll('.e').forEach(x=>x.remove());const cw=epv.getBoundingClientRect().width;
+  edits.filter(x=>x.page===ePage).forEach(x=>{const d=document.createElement('div');d.className='e';d.style.cssText='left:'+x.x*100+'%;top:'+x.y*100+'%;width:'+x.w*100+'%;height:'+x.h*100+'%;font:'+(x.size*cw/eDim.w)+'px Helvetica,Arial,sans-serif;line-height:'+(x.h*100)+'%';d.textContent=x.text;epr.appendChild(d)});
+  $('eGo').disabled=!edits.length}
+$('eShow').onclick=()=>run($('eShow'),'eMsg',async()=>{const f=$('eFile').files[0];if(!f)throw new Error('Choose a PDF first.');
+  const pn=parseInt($('eP').value)||1;const r=await render(f,pn,1.6,epv);ePage=pn;eDim=r;epv.style.display='block';eSel=null;esel.style.display='none';eDraw();say('eMsg','Drag a box over the text to replace.','')});
+epr.onpointerdown=e=>{if(epv.style.display==='none'||e.target.classList.contains('e'))return;epr.setPointerCapture(e.pointerId);const r=epv.getBoundingClientRect();eStart={x:(e.clientX-r.left)/r.width,y:(e.clientY-r.top)/r.height}};
+epr.onpointermove=e=>{if(!eStart)return;const r=epv.getBoundingClientRect(),cx2=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width)),cy2=Math.max(0,Math.min(1,(e.clientY-r.top)/r.height));
+  eSel={x:Math.min(eStart.x,cx2),y:Math.min(eStart.y,cy2),w:Math.abs(cx2-eStart.x),h:Math.abs(cy2-eStart.y)};
+  esel.style.cssText='display:block;left:'+eSel.x*100+'%;top:'+eSel.y*100+'%;width:'+eSel.w*100+'%;height:'+eSel.h*100+'%'};
+epr.onpointerup=()=>{if(!eStart)return;eStart=null;if(eSel&&eSel.h*eDim.h>3)$('eS').value=Math.max(4,Math.round(eSel.h*eDim.h*.75))};
+$('eAdd').onclick=()=>{if(!eSel||eSel.w<.005||eSel.h<.003)return say('eMsg','Drag a box over the old text first.','err');
+  const t=$('eT').value;if(!t.trim())return say('eMsg','Type the new text first.','err');
+  edits.push({page:ePage,...eSel,text:t,size:+$('eS').value||12});eSel=null;esel.style.display='none';$('eT').value='';eDraw();say('eMsg',edits.length+' edit(s) ready. Add more or apply.','ok')};
+$('eUndo').onclick=()=>{edits.pop();eDraw();say('eMsg',edits.length+' edit(s) ready.','')};
+$('eGo').onclick=()=>run($('eGo'),'eMsg',async()=>{const f=$('eFile').files[0];if(!f)throw new Error('Choose a PDF first.');
+  const d=await load(f),font=await d.embedFont(StandardFonts.Helvetica);
+  for(const x of edits){const p=d.getPage(x.page-1),{width:W,height:H}=p.getSize(),bw=x.w*W,bh=x.h*H,bx=x.x*W,by=H-(x.y+x.h)*H;
+    p.drawRectangle({x:bx,y:by,width:bw,height:bh,color:rgb(1,1,1)});
+    p.drawText(x.text,{x:bx+1,y:by+bh*.25,size:x.size,font,color:rgb(0,0,0)})}
+  await save(await d.save(),'edited-text.pdf','eMsg')});
+
+// open tab from link hash
+const h=location.hash.slice(1);if(h&&$(h)&&document.querySelector('#tabs [data-t="'+h+'"]'))document.querySelector('#tabs [data-t="'+h+'"]').click();
+</script>
+</body>
+</html>
